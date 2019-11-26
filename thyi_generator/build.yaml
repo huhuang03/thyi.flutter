@@ -1,0 +1,9 @@
+builders:
+  thyi_generator:
+    import: 'package:thyi_generator/thyi_generator.dart'
+    builder_factories: ['thyiBuilder']
+    build_extensions:
+      .dart:
+        - .thyi.dart
+    build_to: source
+    auto_apply: dependents

@@ -1,0 +1,15 @@
+name: example
+description: use thyi
+version: 1.0.0
+author: Huhuang03 <huhuang03@gmail.com>
+homepage: https://github.com/huhuang03/
+environment:  
+  sdk: ">=2.0.0 <3.0.0"
+dependencies: 
+  build_runner:
+  thyi:
+    path: ../thyi
+dev_dependencies:  
+  thyi_generator:
+    path: ../thyi_generator
+  test:

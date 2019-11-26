@@ -1,0 +1,5 @@
+targets:
+  example:example:
+    builders:
+      thyi_builder|thyiBuilder:
+        enabled: True
