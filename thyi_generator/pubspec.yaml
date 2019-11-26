@@ -8,8 +8,14 @@ environment:
   sdk: '>=2.5.0 <3.0.0'
 
 dependencies:
- path: ^1.6.0
- build:
+  path: ^1.6.0
+  build:
+  source_gen:
+  thyi:
+    path: ../thyi
+  code_builder:
+  dart_style:
+
 
 dev_dependencies:
   pedantic: ^1.8.0
