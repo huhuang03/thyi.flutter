@@ -102,6 +102,7 @@ class _MethodElementEx {
       return null;
     }
     return Method((b) => b
-    ..name = element.displayName);
+    ..name = element.displayName
+    ..returns = Reference(element.returnType));
   }
 }
