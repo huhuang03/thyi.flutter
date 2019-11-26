@@ -101,8 +101,11 @@ class _MethodElementEx {
     if (!isApi()) {
       return null;
     }
+
+    print(element.returnType);
     return Method((b) => b
     ..name = element.displayName
-    ..returns = Reference(element.returnType));
+    ..returns = Reference(element.returnType.displayName)
+    );
   }
 }

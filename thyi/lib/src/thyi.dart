@@ -1,10 +1,17 @@
+import 'dart:async';
 import 'dart:mirrors';
 
 class Thyi {
-  String root;
-  Thyi(this.root);
+  String rootUrl;
+  Thyi(this.rootUrl);
 
-  create(ClassMirror api) {
-
+  // do the request
+  FutureOr<dynamic> doRequest(MethodMirror methodMirror) {
+    
   }
+
+}
+
+class _APiMethod {
+  
 }

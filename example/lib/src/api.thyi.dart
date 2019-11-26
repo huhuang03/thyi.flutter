@@ -4,4 +4,6 @@
 // ThyiGenerator
 // **************************************************************************
 
-class BaiduApi {}
+class BaiduApi__thyiImpl {
+  // FutureOr<String> content();
+}
