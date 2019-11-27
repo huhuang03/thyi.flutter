@@ -1,11 +1,12 @@
 import 'dart:mirrors';
 
+import 'package:example/src/api.thyi.dart';
 import 'package:thyi/thyi.dart';
 
 import 'src/api.dart';
 
 main(List<String> args) async {
   var thyi = Thyi("http://www.baidu.com");
-  var baiduApi = thyi.create(reflectClass(BaiduApi)) as BaiduApi;
-  await print(baiduApi.content());
+  var baiduApi = BaiduApi__thyiImpl(thyi);
+  await print(baiduApi.content().then((data) => print(data)));
 }

@@ -120,6 +120,7 @@ class _CleassElementEx {
 }
 
 class _MethodElementEx {
+  static String VAR_API_METHOD = "apiMethod";
   MethodElement element;
   _MethodElementEx(this.element);
 
@@ -133,15 +134,9 @@ class _MethodElementEx {
     if (!isApi()) {
       return null;
     }
-    print("begin build function: ${element.name}");
-    print(this.element.runtimeType);
-    print(this.element.type);
-    print(this.element.session);
-    print(this.element.source);
-
     List<Code> codes = [];
-    codes.addAll(this._buildPrepare());
-    codes.add(this._buildHttpMethod());
+    codes.add(this._buildApiMethod());
+    codes.add(this._buildReturn());
     
     print(element.returnType);
     var method = Method((b) => b
@@ -152,13 +147,26 @@ class _MethodElementEx {
     return method;
   }
 
-  List<Code> _buildPrepare() {
-    List<Code> rst = [];
-    return rst;
+
+  Code _buildApiMethod() {
+    var params = <Expression>[];
+    final method = this._getHttpMethod();
+    params.add(literal(method[0]));
+    params.add(literal(method[1]));
+    return refer("ApiMethod").newInstance(params).assignFinal(VAR_API_METHOD).statement;
   }
 
-  Code _buildHttpMethod() {
-    return null; 
+  Code _buildReturn() {
+    return refer("apiMethod.send").call([refer("thyi")]).returned.statement;
+  }
+
+  List<String> _getHttpMethod() {
+    var meta = element.metadata.first;
+    if (meta == null) {
+      return ["GET", ""];
+    }
+    print(meta.constantValue.getField("path").toStringValue());
+    return [meta.constantValue.type.toString(), meta.constantValue.getField("path").toStringValue()];
   }
 
 }

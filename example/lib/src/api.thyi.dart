@@ -15,5 +15,8 @@ class BaiduApi__thyiImpl extends BaiduApi {
 
   Thyi thyi;
 
-  FutureOr<String> content() {}
+  Future<String> content() {
+    final apiMethod = ApiMethod('GET', '/');
+    return apiMethod.send(thyi);
+  }
 }
