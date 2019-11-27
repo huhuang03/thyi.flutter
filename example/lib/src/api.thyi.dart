@@ -4,6 +4,16 @@
 // ThyiGenerator
 // **************************************************************************
 
-class BaiduApi__thyiImpl {
-  // FutureOr<String> content();
+import 'dart:async';
+import 'api.dart';
+import 'package:thyi/thyi.dart';
+
+class BaiduApi__thyiImpl extends BaiduApi {
+  BaiduApi__thyiImpl(Thyi thyi) {
+    this.thyi = thyi;
+  }
+
+  Thyi thyi;
+
+  FutureOr<String> content() {}
 }

@@ -7,8 +7,8 @@ description: thyi annotations
 environment:
   sdk: '>=2.5.0 <3.0.0'
 
-#dependencies:
-#  path: ^1.6.0
+dependencies:
+  dio:
 
 dev_dependencies:
   pedantic: ^1.8.0

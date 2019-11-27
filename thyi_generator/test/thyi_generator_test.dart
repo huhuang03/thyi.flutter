@@ -7,10 +7,11 @@ void main() {
     final animal = Class((b) => b
       ..name = 'Animal'
       ..extend = refer('Organism')
-      ..methods.add(Method.returnsVoid((b) => b
+      ..methods.add(Method((b) => b
+        ..returns = refer('Foo', 'package:foo')
         ..name = 'eat'
         ..body = const Code("print('Yum');"))));
-      final emitter = DartEmitter();
+      final emitter =  DartEmitter(Allocator.simplePrefixing());;
       print(DartFormatter().format('${animal.accept(emitter)}'));
   });
 }

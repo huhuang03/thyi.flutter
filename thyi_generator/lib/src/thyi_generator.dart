@@ -6,6 +6,7 @@ import 'package:source_gen/source_gen.dart';
 import 'package:thyi/thyi.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart';
+import 'package:code_builder/code_builder.dart' as cb;
 import 'package:dart_style/dart_style.dart';
 
 class ThyiGenerator extends Generator {
@@ -17,7 +18,7 @@ class ThyiGenerator extends Generator {
     var inputId = buildStep.inputId;
     print("begin parse ${inputId.path}");
 
-    var file = _FileEx(library);
+    var file = _FileEx(library, inputId);
     if (!file.isApi()) {
       return null;
     }
@@ -46,18 +47,27 @@ class ThyiGenerator extends Generator {
 }
 
 class _FileEx {
+  static String PKG_THYI = "package:thyi/thyi.dart";
   List<_CleassElementEx> classes = [];
+  List<String> pathSegments;
 
-  _FileEx(LibraryReader reader) {
+  _FileEx(LibraryReader reader, AssetId assetId) {
     this.classes = reader.classes.map((clz) => _CleassElementEx(clz)).toList(growable: true);
+    this.pathSegments = assetId.pathSegments;
   }
 
   bool isApi() {
-    return classes.isNotEmpty && classes.any((c) => c.isApi());
+    return "test" != this.pathSegments[0] && classes.any((c) => c.isApi());
   }
 
   String build() {
-    return this.classes.map((clz) => clz.build()).where((str) => str != null).join("\n");
+    final library = Library((b) => b
+    ..directives.addAll(
+      [Directive.import('dart:async')
+      , Directive.import(this.pathSegments.last)
+      , Directive.import(PKG_THYI)])
+    ..body.addAll(this.classes.map((clz) => clz.build(b)).where((c) => c != null)));
+    return DartFormatter().format('${library.accept(DartEmitter())}');
   }
 }
 
@@ -66,24 +76,46 @@ class _CleassElementEx {
   static var CLASS_PREFIX = "_thyiImpl";
   List<_MethodElementEx> _methods = [];
   ClassElement element;
+  String name;
   
 
   _CleassElementEx(this.element) {
     this._methods = element.methods.map((method) => _MethodElementEx(method)).toList(growable: true);
+    this.name = "${element.name}_${CLASS_PREFIX}";
   }
 
   bool isApi() {
     return _methods.any((method) => method.isApi());
   }
 
-  String build() {
-    print(this.element);
-    print(this.element.name);
+  Class build(cb.LibraryBuilder library) {
     var c = Class((b) => b
-    ..name = "${element.name}_${CLASS_PREFIX}"
+    ..name = this.name
+    ..fields.addAll(this._buildFields())
+    ..constructors.add(this._buildConstructor())
+    ..extend = refer("${element.name}")
     ..methods.addAll(this._methods.map((method) => method.build()).where((method) => method != null))
     );
-    return DartFormatter().format("${c.accept(DartEmitter())}");
+    return c;
+  }
+
+  List<Field> _buildFields() {
+    List<Field> rst = [];
+    rst.add(Field((b) {b
+    ..name = "thyi"
+    ..type = refer("Thyi");
+    }));
+    return rst;
+  }
+
+  Constructor _buildConstructor() {
+    return Constructor((c) {c
+    ..requiredParameters.add(Parameter((p) {p
+      ..name = "thyi"
+      ..type = refer("Thyi");
+    }))
+    ..body = Code('this.thyi = thyi;');
+    });
   }
 }
 
@@ -101,11 +133,32 @@ class _MethodElementEx {
     if (!isApi()) {
       return null;
     }
+    print("begin build function: ${element.name}");
+    print(this.element.runtimeType);
+    print(this.element.type);
+    print(this.element.session);
+    print(this.element.source);
 
+    List<Code> codes = [];
+    codes.addAll(this._buildPrepare());
+    codes.add(this._buildHttpMethod());
+    
     print(element.returnType);
-    return Method((b) => b
+    var method = Method((b) => b
     ..name = element.displayName
-    ..returns = Reference(element.returnType.displayName)
+    ..returns = refer(element.returnType.displayName, 'dart:async')
+    ..body = Block.of(codes.where((code) => code != null).toList())
     );
+    return method;
   }
+
+  List<Code> _buildPrepare() {
+    List<Code> rst = [];
+    return rst;
+  }
+
+  Code _buildHttpMethod() {
+    return null; 
+  }
+
 }
