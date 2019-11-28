@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:mirrors';
 
 import 'package:dio/dio.dart';
-import 'package:thyi/thyi.dart';
 
 class Thyi {
   Dio dio;
@@ -42,6 +40,7 @@ class ApiMethod {
       Future.error("for now unsupport http method; ${this.method}");
     }
   }
+
 }
 
 

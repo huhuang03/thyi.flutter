@@ -15,6 +15,7 @@ dependencies:
     path: ../thyi
   code_builder:
   dart_style:
+  json_serializable:
 
 
 dev_dependencies:

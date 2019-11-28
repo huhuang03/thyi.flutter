@@ -10,6 +10,7 @@ dependencies:
   thyi:
     path: ../thyi
 dev_dependencies:  
+  json_serializable:
   thyi_generator:
     path: ../thyi_generator
   test:

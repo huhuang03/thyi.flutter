@@ -1,2 +1,2 @@
 export 'src/annotations.dart';
-export 'src/thyi.dart';
+export 'src/_thyi.dart';

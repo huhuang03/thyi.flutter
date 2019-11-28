@@ -5,6 +5,7 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:thyi/thyi.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:code_builder/code_builder.dart' as cb;
 import 'package:dart_style/dart_style.dart';
@@ -16,15 +17,13 @@ class ThyiGenerator extends Generator {
 
   @override FutureOr<String> generate(LibraryReader library, BuildStep buildStep) {
     var inputId = buildStep.inputId;
-    print("begin parse ${inputId.path}");
-
     var file = _FileEx(library, inputId);
     if (!file.isApi()) {
       return null;
     }
 
     print("begin handle file: ${inputId.path}");
-    return file.build();
+    return file.build(inputId);
   }
 
   // bool _classIsApi(ClassElement classElement) {
@@ -60,13 +59,13 @@ class _FileEx {
     return "test" != this.pathSegments[0] && classes.any((c) => c.isApi());
   }
 
-  String build() {
+  String build(AssetId inputId) {
     final library = Library((b) => b
     ..directives.addAll(
       [Directive.import('dart:async')
       , Directive.import(this.pathSegments.last)
       , Directive.import(PKG_THYI)])
-    ..body.addAll(this.classes.map((clz) => clz.build(b)).where((c) => c != null)));
+    ..body.addAll(this.classes.map((clz) => clz.build(inputId, b)).where((c) => c != null)));
     return DartFormatter().format('${library.accept(DartEmitter())}');
   }
 }
@@ -88,13 +87,13 @@ class _CleassElementEx {
     return _methods.any((method) => method.isApi());
   }
 
-  Class build(cb.LibraryBuilder library) {
+  Class build(AssetId inputId, cb.LibraryBuilder library) {
     var c = Class((b) => b
     ..name = this.name
     ..fields.addAll(this._buildFields())
     ..constructors.add(this._buildConstructor())
     ..extend = refer("${element.name}")
-    ..methods.addAll(this._methods.map((method) => method.build()).where((method) => method != null))
+    ..methods.addAll(this._methods.map((method) => method.build(inputId, library)).where((method) => method != null))
     );
     return c;
   }
@@ -112,6 +111,7 @@ class _CleassElementEx {
     return Constructor((c) {c
     ..requiredParameters.add(Parameter((p) {p
       ..name = "thyi"
+      ..toThis = true
       ..type = refer("Thyi");
     }))
     ..body = Code('this.thyi = thyi;');
@@ -130,23 +130,46 @@ class _MethodElementEx {
     });
   }
 
-  Method build() {
+  Method build(AssetId inputId, cb.LibraryBuilder library) {
     if (!isApi()) {
       return null;
     }
+    var returnType = element.returnType;
+    if (!returnType.isDartAsyncFuture) {
+      throw ArgumentError("for now can only support return Future");
+    }
+
+    this._buildReturnImport(inputId, library);
+
     List<Code> codes = [];
     codes.add(this._buildApiMethod());
     codes.add(this._buildReturn());
     
-    print(element.returnType);
     var method = Method((b) => b
     ..name = element.displayName
+    ..annotations.add(refer("override"))
     ..returns = refer(element.returnType.displayName, 'dart:async')
     ..body = Block.of(codes.where((code) => code != null).toList())
     );
     return method;
   }
 
+  void _buildReturnImport(AssetId inputId, cb.LibraryBuilder library) {
+    var returnType = this.element.returnType as ParameterizedType;
+    var package = inputId.package;
+
+    returnType.typeArguments.forEach((p) {
+      print("import element");
+      var fullPath = p.element.library.source.toString();
+      fullPath = fullPath.substring(1);
+      if (!fullPath.startsWith("${package}/")) {
+        throw ArgumentError("doesn't impl import out package: ${fullPath}, current pkg: ${inputId.path}");
+      }
+      fullPath = fullPath.replaceAll("/lib/", "/");
+      fullPath = "package:" + fullPath;
+      library.directives.add(Directive.import(fullPath));
+    });
+  }
 
   Code _buildApiMethod() {
     var params = <Expression>[];
@@ -165,7 +188,6 @@ class _MethodElementEx {
     if (meta == null) {
       return ["GET", ""];
     }
-    print(meta.constantValue.getField("path").toStringValue());
     return [meta.constantValue.type.toString(), meta.constantValue.getField("path").toStringValue()];
   }
 
