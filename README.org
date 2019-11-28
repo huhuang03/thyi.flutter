@@ -1,3 +1,2 @@
 * Steps
-- check the bean has json_serializable of not.
 - auto gson serialize

@@ -63,6 +63,7 @@ class _FileEx {
     final library = Library((b) => b
     ..directives.addAll(
       [Directive.import('dart:async')
+      , Directive.import('dart:convert')
       , Directive.import(this.pathSegments.last)
       , Directive.import(PKG_THYI)])
     ..body.addAll(this.classes.map((clz) => clz.build(inputId, b)).where((c) => c != null)));
@@ -139,11 +140,11 @@ class _MethodElementEx {
       throw ArgumentError("for now can only support return Future");
     }
 
-    this._buildReturnImport(inputId, library);
+    var name = this._buildReturnImport(inputId, library);
 
     List<Code> codes = [];
     codes.add(this._buildApiMethod());
-    codes.add(this._buildReturn());
+    codes.add(this._buildReturn(name));
     
     var method = Method((b) => b
     ..name = element.displayName
@@ -154,12 +155,15 @@ class _MethodElementEx {
     return method;
   }
 
-  void _buildReturnImport(AssetId inputId, cb.LibraryBuilder library) {
+  // ugly
+  String _buildReturnImport(AssetId inputId, cb.LibraryBuilder library) {
     var returnType = this.element.returnType as ParameterizedType;
     var package = inputId.package;
+    String rst = "";
 
     returnType.typeArguments.forEach((p) {
       print("import element");
+      rst = p.element.name;
       var fullPath = p.element.library.source.toString();
       fullPath = fullPath.substring(1);
       if (!fullPath.startsWith("${package}/")) {
@@ -169,6 +173,7 @@ class _MethodElementEx {
       fullPath = "package:" + fullPath;
       library.directives.add(Directive.import(fullPath));
     });
+    return rst;
   }
 
   Code _buildApiMethod() {
@@ -179,8 +184,11 @@ class _MethodElementEx {
     return refer("ApiMethod").newInstance(params).assignFinal(VAR_API_METHOD).statement;
   }
 
-  Code _buildReturn() {
-    return refer("apiMethod.send").call([refer("thyi")]).returned.statement;
+  Code _buildReturn(String name) {
+    return 
+    // "then((d) => User.fromJson(jsonDecode(d)))".
+    // refer("apiMethod.send").call([refer("thyi")]).returned.statement;
+    refer("apiMethod.send(thyi).then((d) => ${name}.fromJson(jsonDecode(d)))").returned.statement;
   }
 
   List<String> _getHttpMethod() {

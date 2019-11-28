@@ -5,6 +5,7 @@
 // **************************************************************************
 
 import 'dart:async';
+import 'dart:convert';
 import 'api.dart';
 import 'package:thyi/thyi.dart';
 import 'package:example/src/user.dart';
@@ -19,6 +20,6 @@ class BaiduApi__thyiImpl extends BaiduApi {
   @override
   Future<User> content() {
     final apiMethod = ApiMethod('GET', '/');
-    return apiMethod.send(thyi);
+    return apiMethod.send(thyi).then((d) => User.fromJson(jsonDecode(d)));
   }
 }
