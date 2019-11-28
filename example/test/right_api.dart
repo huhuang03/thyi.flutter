@@ -1,39 +1,20 @@
-import 'dart:async';
 import 'dart:mirrors';
 
 import 'package:example/src/api.dart';
 import 'package:thyi/thyi.dart';
+import 'package:test/test.dart';
 
-class TheRight extends BaiduApi {
-  Thyi thyi;
-  InstanceMirror thisMirror;
-
-  TheRight(this.thyi) {
-    this.thisMirror = reflect(this);
-    // thisMirror.type.instanceMembers
-  }
-
-  @GET("/")
-  @override FutureOr<String> content() {
-    List<ThyiParam> param = [];
-    var methodMirror = _findMethod(#content);
-    TypeMirror returnType = methodMirror.returnType;
-
-    var method = methodMirror.metadata.first as dynamic;
-    var value = method.path;
-    param.add(ThyiParam(value, method));
-
-    thyi.doRequest(param);
-  }
-
-  MethodMirror _findMethod(Symbol name) {
-    MethodMirror rst;
-    this.thisMirror.type.instanceMembers.forEach((symbol, method) {
-      if (symbol == #content) {
-        rst = method;
-      } 
-    });
-    return rst;
-  }
-
+void main() {
+  test('calculate', () {
+    
+    // var reflect = reflectClass(BaiduApi);
+    // print(reflect);
+    // print(reflect.reflectedType);
+    // print(reflect.reflectedType);
+    //   // for (var lib in currentMirrorSystem().libraries.values) {
+    //   //   // print(lib);
+    //   //   // var mirror = lib.declarations[MirrorSystem.getSymbol(name)];
+    //   //   // if (mirror != null) return mirror;
+    //   // }
+  });
 }

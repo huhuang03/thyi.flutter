@@ -1,2 +1,2 @@
 * Steps
-- How to import the origin class
+- auto gson serialize
