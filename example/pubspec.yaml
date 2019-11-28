@@ -9,6 +9,7 @@ dependencies:
   build_runner:
   thyi:
     path: ../thyi
+  dio:
 dev_dependencies:  
   json_serializable:
   thyi_generator:

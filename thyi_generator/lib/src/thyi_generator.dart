@@ -25,24 +25,6 @@ class ThyiGenerator extends Generator {
     print("begin handle file: ${inputId.path}");
     return file.build(inputId);
   }
-
-  // bool _classIsApi(ClassElement classElement) {
-  //   print(classElement.methods);
-  //   var methods = classElement.methods;
-  //   for (var method in methods) {
-  //     print(TypeChecker.fromRuntime(typeGet).hasAnnotationOf(method, throwOnUnresolved: false));
-  //     var metaDatas = method.metadata;
-  //     for (var meta in metaDatas) {
-  //       print("11111");
-  //       print(meta);
-  //       print(meta.computeConstantValue() is GET);
-  //       print(meta.constantValue is GET);
-  //       print(meta.source is GET);
-  //     }
-  //     print(metaDatas);
-  //   }
-  //   return false;
-  // }
 }
 
 class _FileEx {

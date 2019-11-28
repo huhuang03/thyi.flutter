@@ -10,8 +10,8 @@ import 'api.dart';
 import 'package:thyi/thyi.dart';
 import 'package:example/src/user.dart';
 
-class BaiduApi__thyiImpl extends BaiduApi {
-  BaiduApi__thyiImpl(Thyi this.thyi) {
+class SimpleApi__thyiImpl extends SimpleApi {
+  SimpleApi__thyiImpl(Thyi this.thyi) {
     this.thyi = thyi;
   }
 
@@ -19,7 +19,9 @@ class BaiduApi__thyiImpl extends BaiduApi {
 
   @override
   Future<User> content() {
-    final apiMethod = ApiMethod('GET', '/');
-    return apiMethod.send(thyi).then((d) => User.fromJson(jsonDecode(d)));
+    final apiMethod = ApiMethod('GET', '/user/1');
+    return apiMethod.send(thyi).then((d) {
+      return User.fromJson(jsonDecode(d));
+    });
   }
 }

@@ -29,12 +29,13 @@ class ApiMethod {
     }
 
     if ("GET" == method.toUpperCase()) {
-      print("do get");
-      return dio.get(this.path, queryParameters: queries, options: options)
+      print("path: ${path}");
+      print("rootUrl: ${dio.options.baseUrl}");
+      return dio.get<String>(this.path, queryParameters: queries, options: options)
       .then((response) => response.data.toString());
     }
     else if ("POST" == method.toUpperCase()) {
-      return dio.post(this.path, queryParameters: queries, options: options, data: fields)
+      return dio.post<String>(this.path, queryParameters: queries, options: options, data: fields)
       .then((response) => response.data.toString());
     } else {
       Future.error("for now unsupport http method; ${this.method}");
