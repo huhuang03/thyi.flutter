@@ -94,8 +94,7 @@ class _CleassElementEx {
     return Constructor((c) {c
     ..requiredParameters.add(Parameter((p) {p
       ..name = "thyi"
-      ..toThis = true
-      ..type = refer("Thyi");
+      ..toThis = true;
     }))
     ..body = Code('this.thyi = thyi;');
     });
@@ -168,8 +167,6 @@ class _MethodElementEx {
 
   Code _buildReturn(String name) {
     return 
-    // "then((d) => User.fromJson(jsonDecode(d)))".
-    // refer("apiMethod.send").call([refer("thyi")]).returned.statement;
     refer("apiMethod.send(thyi).then((d) => ${name}.fromJson(jsonDecode(d)))").returned.statement;
   }
 
